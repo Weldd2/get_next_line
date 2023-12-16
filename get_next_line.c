@@ -1,42 +1,93 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: antoinemura <antoinemura@student.42.fr>    +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/12/02 16:57:17 by antoinemura       #+#    #+#             */
-/*   Updated: 2023/12/16 15:05:04 by antoinemura      ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include "get_next_line.h"
 
+int	ft_strlen(char *s)
+{
+	int	i;
+
+	i = 0;
+	while (s[i])
+		i++;
+	return (i);
+}
+
+char	*ft_strcpy(char *src, char *dest)
+{
+	int	i;
+
+	i = 0;
+	while(src[i])
+	{
+		dest[i] = src[i];
+		i++;
+	}
+	return (dest);
+}
+
+char	*ft_strcat(char *src, char *dest)
+{
+	int	i;
+	int	dest_l;
+
+	i = 0;
+	dest_l = ft_strlen(dest);
+	while (src[i])
+	{
+		dest[i + dest_l] = src[i]; 
+		i++;
+	}
+	return (dest);
+}
+
+char	*ft_calloc(char *line)
+{
+	char	*save;
+
+	save = malloc(ft_strlen(line));
+	ft_strcpy(line, save);
+	free(line);
+	line = malloc(ft_strlen(save) + 1);
+	ft_strcpy(save, line);
+	return (line);
+}
+
 char	*get_next_line(int fd)
 {
-	static char	*buffer = NULL;
-	static int	buffer_size = 0;
-	char		*line;
-	int			i;
-	int			line_size;
+	char	*line;
+	char	*buffer;
+	int		bytes_read;
 
-	if (buffer_size == 0)
+	line = malloc(1);
+	buffer = malloc(1);
+	while (1)
 	{
-		buffer = malloc(BUFFER_SIZE);
-		buffer_size = read(fd, buffer, BUFFER_SIZE);
+		line = ft_calloc(line);
+		bytes_read = read(fd, buffer, 1);
+		ft_strcat(buffer, line);
+		if (bytes_read == 0 && ft_strlen(line) == 0)
+			return (NULL) ;
+		if (line[ft_strlen(line) - 1] == '\n' || bytes_read == 0)
+			break ;
 	}
-	else
-		if (buffer[0] == '\0')
-			return (NULL);
-	line_size = 0;
-	while (line_size < buffer_size && buffer[line_size - 1] != '\n' 
-											&& buffer[line_size] != '\0')
-		line_size++;
-	line = malloc(line_size + 2);
-	for (i = 0; i < line_size; i++)
-		line[i] = buffer[i];
-	line[i + 1] = '\0';
-	buffer += (line_size + 1);
-	buffer_size -= (line_size + 1);
 	return (line);
+}
+
+int main(void) {
+
+	FILE *file = fopen("get_next_line.c", "r");
+	if (file == NULL) {
+		perror("Error opening file");
+		return 1;
+	}
+
+	int fd = fileno(file);
+	char *line;
+
+	while ((line = get_next_line(fd)) != NULL) {
+		printf("a%s", line);
+		free(line);
+	}
+
+	fclose(file);
+	return 0;
 }
