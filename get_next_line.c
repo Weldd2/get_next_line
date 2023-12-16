@@ -11,62 +11,86 @@ int	ft_strlen(char *s)
 	return (i);
 }
 
-char	*ft_strcpy(char *src, char *dest)
+char	*ft_strjoin(char *line, char *buffer)
 {
-	int	i;
+	char	*s;
+	int		i;
 
-	i = 0;
-	while(src[i])
+	s = (char *)malloc(sizeof(char) * (ft_strlen(buffer) + ft_strlen(line) + 1));
+	if (!s)
+		return (NULL);
+	i = -1;
+	while (line[++i])
+		s[i] = line[i];
+	while (*buffer && *buffer != '\n')
 	{
-		dest[i] = src[i];
+		s[i] = *buffer;
+		i++;
+		buffer++;
+	}
+	if (*buffer == '\n')
+	{
+		s[i] = '\n';
+		buffer++;
 		i++;
 	}
-	return (dest);
-}
-
-char	*ft_strcat(char *src, char *dest)
-{
-	int	i;
-	int	dest_l;
-
-	i = 0;
-	dest_l = ft_strlen(dest);
-	while (src[i])
-	{
-		dest[i + dest_l] = src[i]; 
-		i++;
-	}
-	return (dest);
-}
-
-char	*ft_calloc(char *line)
-{
-	char	*save;
-
-	save = malloc(ft_strlen(line));
-	ft_strcpy(line, save);
+	s[i] = '\0';
 	free(line);
-	line = malloc(ft_strlen(save) + 1);
-	ft_strcpy(save, line);
-	return (line);
+	return (s);
 }
+
+void	*ft_memset(void *s, int c, size_t n)
+{
+	unsigned char	*ptr;
+
+	ptr = (unsigned char *)s;
+	while (n > 0)
+	{
+		*ptr = (unsigned char)c;
+		ptr++;
+		n--;
+	}
+	return (s);
+}
+
+void	*ft_calloc(size_t nmemb, size_t size)
+{
+	void	*ptr;
+
+	if (nmemb == 0 || size == 0)
+		return (malloc(0));
+	ptr = malloc(nmemb * size);
+	if (!ptr)
+		return (NULL);
+	ft_memset(ptr, 0, nmemb * size);
+	return (ptr);
+}
+
 
 char	*get_next_line(int fd)
 {
-	char	*line;
-	char	*buffer;
-	int		bytes_read;
+	char		*line;
+	static char	*buffer = NULL;
+	int			bytes_read;
 
-	line = malloc(1);
-	buffer = malloc(1);
+	if (buffer == NULL)
+		buffer = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
+	line = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
+	bytes_read = -1;
 	while (1)
 	{
-		line = ft_calloc(line);
-		bytes_read = read(fd, buffer, 1);
-		ft_strcat(buffer, line);
-		if (bytes_read == 0 && ft_strlen(line) == 0)
-			return (NULL) ;
-		if (line[ft_strlen(line) - 1] == '\n' || bytes_read == 0)
+		bytes_read = read(fd, buffer, BUFFER_SIZE);
+		buffer[bytes_read] = '\0';
+		if (bytes_read == 0 && ft_strlen(buffer) == 0)
+		{
+			free(buffer);
+			free(line);
+			return (NULL);
+		}
+		if (bytes_read == 0)
+			break ;
+		line = ft_strjoin(line, buffer);
+		if (*buffer == '\n' || *(buffer + 1) == '\0')
 			break ;
 	}
 	return (line);
@@ -74,7 +98,7 @@ char	*get_next_line(int fd)
 
 int main(void) {
 
-	FILE *file = fopen("get_next_line.c", "r");
+	FILE *file = fopen("test", "r");
 	if (file == NULL) {
 		perror("Error opening file");
 		return 1;
@@ -84,7 +108,7 @@ int main(void) {
 	char *line;
 
 	while ((line = get_next_line(fd)) != NULL) {
-		printf("a%s", line);
+		printf("%s", line);
 		free(line);
 	}
 

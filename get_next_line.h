@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.h                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: antoinemura <antoinemura@student.42.fr>    +#+  +:+       +#+        */
+/*   By: amura <amura@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/02 17:28:48 by antoinemura       #+#    #+#             */
-/*   Updated: 2023/12/16 17:20:04 by antoinemura      ###   ########.fr       */
+/*   Updated: 2023/12/16 23:53:15 by amura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,6 @@
 char	*get_next_line(int fd);
 
 #ifndef  BUFFER_SIZE 
-# define BUFFER_SIZE 1
+# define BUFFER_SIZE 2
 #endif
 
