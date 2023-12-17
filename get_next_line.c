@@ -111,25 +111,27 @@ char	*get_next_line(int fd)
 			free(line);
 			return (NULL);
 		}
+		if (bytes_read == 0 && *line != '\0')
+			return (line);
 	}
 }
 
-// int main(void) {
+int main(void) {
 
-// 	FILE *file = fopen("test", "r");
-// 	if (file == NULL) {
-// 		perror("Error opening file");
-// 		return 1;
-// 	}
+	FILE *file = fopen("test", "r");
+	if (file == NULL) {
+		perror("Error opening file");
+		return 1;
+	}
 
-// 	int fd = fileno(file);
-// 	char *line;
+	int fd = fileno(file);
+	char *line;
 
-// 	while ((line = get_next_line(fd)) != NULL) {
-// 		printf("%s", line);
-// 		free(line);
-// 	}
+	while ((line = get_next_line(fd)) != NULL) {
+		printf("[%s]", line);
+		free(line);
+	}
 
-// 	fclose(file);
-// 	return 0;
-// }
+	fclose(file);
+	return 0;
+}
