@@ -6,7 +6,7 @@
 /*   By: antoinemura <antoinemura@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/25 23:27:04 by antoinemura       #+#    #+#             */
-/*   Updated: 2023/12/25 23:29:04 by antoinemura      ###   ########.fr       */
+/*   Updated: 2023/12/25 23:59:44 by antoinemura      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,10 @@ int	read_from_fd(int fd, char *buffer, int *read_bytes, int *buffer_i)
 {
 	*buffer_i = 0;
 	*read_bytes = read(fd, buffer, BUFFER_SIZE);
+	if (*read_bytes > 0)
+		buffer[*read_bytes] = '\0';
+	else if (*read_bytes < 0)
+		buffer[0] = '\0';
 	return (*read_bytes);
 }
 
@@ -23,9 +27,12 @@ char	*append_char_to_line(char *line, int *line_l, char c)
 {
 	char	*new_line;
 
-	new_line = realloc(line, *line_l + 2);
+	new_line = ft_realloc(line, *line_l, *line_l + 2);
 	if (!new_line)
+	{
+		free(line);
 		return (NULL);
+	}
 	new_line[*line_l] = c;
 	(*line_l)++;
 	new_line[*line_l] = '\0';
