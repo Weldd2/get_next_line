@@ -1,0 +1,19 @@
+int main(void) {
+
+	FILE *file = fopen("main.c", "r");
+	if (file == NULL) {
+		perror("Error opening file");
+		return 1;
+	}
+
+	int fd = fileno(file);
+	char *line;
+
+	while ((line = get_next_line(fd)) != NULL) {
+		printf("%s", line);
+		free(line);
+	}
+
+	fclose(file);
+	return 0;
+}
