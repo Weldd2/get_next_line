@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: antoinemura <antoinemura@student.42.fr>    +#+  +:+       +#+        */
+/*   By: amura <amura@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/25 23:27:04 by antoinemura       #+#    #+#             */
-/*   Updated: 2023/12/25 23:59:44 by antoinemura      ###   ########.fr       */
+/*   Updated: 2024/01/13 17:34:29 by amura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,26 +51,26 @@ char	*handle_line_br(char *line, char *buffer, int *buffer_i, int *line_l)
 char	*get_next_line(int fd)
 {
 	static char	buffer[BUFFER_SIZE + 1];
-	static int	read_bytes = 0;
-	static int	buffer_i = 0;
+	static int	read_b = 0;
+	static int	i = 0;
 	char		*line;
 	int			line_l;
 
-	line = NULL;
 	line_l = 0;
+	line = NULL;
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
 	while (1)
 	{
-		if (buffer_i >= read_bytes)
+		if (i >= read_b && (read_from_fd(fd, buffer, &read_b, &i) <= 0))
 		{
-			if (read_from_fd(fd, buffer, &read_bytes, &buffer_i) <= 0)
-				return (line);
+			if (read_b < 0)
+				return (free(line), NULL);
+			return (line);
 		}
-		if (buffer[buffer_i] == '\n' || buffer[buffer_i] == '\0')
-			return (handle_line_br(line, buffer, &buffer_i, &line_l));
-		else
-			line = append_char_to_line(line, &line_l, buffer[buffer_i++]);
+		if (buffer[i] == '\n' || buffer[i] == '\0')
+			return (handle_line_br(line, buffer, &i, &line_l));
+		line = append_char_to_line(line, &line_l, buffer[i++]);
 		if (!line)
 			return (NULL);
 	}
